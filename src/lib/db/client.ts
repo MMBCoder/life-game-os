@@ -37,9 +37,27 @@ type DbGlobal = {
 
 const globalForDb = globalThis as unknown as DbGlobal;
 
+/**
+ * The connection string, from whichever variable the host actually set.
+ *
+ * `DATABASE_URL` is ours and wins. `POSTGRES_URL` is what Vercel's Postgres
+ * integrations inject — attaching one of those and finding the app still refuse to
+ * start would be a baffling way to lose an afternoon.
+ *
+ * Deliberately not `POSTGRES_URL_NON_POOLING`: that is the direct connection, and a
+ * serverless deployment opening one per invocation exhausts the server's connection
+ * limit. Pooled is the correct default here.
+ */
+export function postgresUrl(): string | null {
+  for (const candidate of [process.env.DATABASE_URL, process.env.POSTGRES_URL]) {
+    const trimmed = candidate?.trim();
+    if (trimmed) return trimmed;
+  }
+  return null;
+}
+
 function isPostgresConfigured(): boolean {
-  const url = process.env.DATABASE_URL;
-  return typeof url === 'string' && url.trim().length > 0;
+  return postgresUrl() !== null;
 }
 
 export function activeDriver(): 'pglite' | 'postgres' {
@@ -60,7 +78,8 @@ function assertPersistentStorage(): void {
   if (isPostgresConfigured() || !isServerlessRuntime()) return;
 
   throw new Error(
-    'DATABASE_URL is not set, and this is a serverless deployment.\n' +
+    'No Postgres connection string found (checked DATABASE_URL and POSTGRES_URL), ' +
+      'and this is a serverless deployment.\n' +
       'The embedded database would be discarded on every cold start, losing every ' +
       'account and all of its history.\n' +
       'Fix: provision a Postgres database, set DATABASE_URL, then run ' +
@@ -71,10 +90,11 @@ function assertPersistentStorage(): void {
 async function createDatabase(): Promise<Database> {
   assertPersistentStorage();
 
-  if (isPostgresConfigured()) {
+  const url = postgresUrl();
+  if (url) {
     // Dynamic import keeps the postgres driver out of the bundle when unused.
     const postgres = (await import('postgres')).default;
-    const client = postgres(process.env.DATABASE_URL as string, {
+    const client = postgres(url, {
       // Serverless: a small pool per instance, with idle connections released.
       max: Number(process.env.DATABASE_POOL_MAX ?? 5),
       idle_timeout: 20,

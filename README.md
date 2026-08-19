@@ -239,7 +239,7 @@ development.
 
 | Variable | Required | Default | Purpose |
 |---|---|---|---|
-| `DATABASE_URL` | Production only | *unset* → PGlite | Postgres connection string. When unset the app uses the embedded database at `.data/pglite`. |
+| `DATABASE_URL` | **Serverless** | *unset* → PGlite | Postgres connection string. `POSTGRES_URL` is accepted as a fallback, since that is what Vercel's Postgres integrations inject. When neither is set the app uses the embedded database at `.data/pglite`. |
 | `SESSION_SECRET` | **Production** | dev-only fallback | Signing secret for session cookies. Generate with `openssl rand -base64 48`. |
 | `ANTHROPIC_API_KEY` | No | *unset* → mock | Enables the real council on Claude. |
 | `OPENAI_API_KEY` | No | *unset* → mock | Enables the real council on GPT-5. Supply either key, or neither. |
@@ -372,8 +372,14 @@ Target: **Vercel**, though any Node host works.
 > visits. The app now refuses to start in that configuration rather than appear to work; see
 > [Why history needs a real database](#why-history-needs-a-real-database).
 
-1. **Provision Postgres** — Vercel Postgres, Neon, Supabase, RDS, anything. Copy the pooled
-   connection string.
+1. **Provision Postgres.** On Vercel this is the **Storage** tab — the SQL offering is fulfilled
+   through the Marketplace (Neon, Supabase, Prisma Postgres and similar), so pick "Postgres" and
+   ignore the branding. Anywhere else: Neon, Supabase, RDS, or your own server.
+
+   Copy the **pooled** connection string. Serverless opens a connection per invocation and will
+   exhaust a direct one; `*_NON_POOLING` is the wrong variable here. Attaching a Vercel
+   integration usually injects `POSTGRES_URL` automatically, which the app accepts — so this step
+   may already be done for you.
 2. **Set environment variables** on the host:
    ```
    DATABASE_URL=postgres://...?sslmode=require   # required

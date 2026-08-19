@@ -7,11 +7,15 @@
  */
 import { rm } from 'node:fs/promises';
 import path from 'node:path';
+import { postgresUrl } from '../src/lib/db/client';
 
 async function main() {
-  if (process.env.DATABASE_URL?.trim()) {
+  // Shares the app's resolver rather than checking one variable, so the guard cannot
+  // drift out of step with what actually counts as "a real database".
+  if (postgresUrl()) {
     console.error(
-      '✗ DATABASE_URL is set. This script only resets the local embedded database.\n' +
+      '✗ A Postgres connection string is set (DATABASE_URL or POSTGRES_URL).\n' +
+        '  This script only resets the local embedded database.\n' +
         '  To reset a real database, do it deliberately with your own tooling.',
     );
     process.exit(1);
