@@ -1,0 +1,14 @@
+# Normalise to LF in the repository. The app is authored on Windows and built on
+# Linux (Vercel); without this every file round-trips as modified.
+* text=auto eol=lf
+
+# Binary — never touch.
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Generated: keep out of diffs and language stats.
+package-lock.json -diff linguist-generated
+drizzle/meta/*.json -diff linguist-generated

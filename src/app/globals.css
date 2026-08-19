@@ -1,0 +1,402 @@
+@import 'tailwindcss';
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIFE GAME OS — design tokens
+   Single source of truth. Components must never contain raw colour values.
+   See docs/design-system.md
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Primitives ─────────────────────────────────────────────────────────── */
+  --color-navy-900: #0d1b2a;
+  --color-navy-800: #132436;
+  --color-navy-700: #1b3149;
+  --color-teal-700: #176e6e;
+  --color-teal-600: #1f8a8a;
+  --color-teal-500: #2a9d9c;
+  --color-teal-400: #3aafae;
+  --color-teal-100: #d7ecec;
+  --color-sage-500: #8fb178;
+  --color-sage-300: #c8ddb8;
+  --color-sage-100: #e8f2e0;
+  --color-ivory-50: #f7f5ef;
+  --color-ivory-100: #efece3;
+  --color-charcoal-900: #20252b;
+  --color-charcoal-700: #3a424c;
+  --color-slate-500: #667085;
+  --color-slate-400: #8a93a5;
+  --color-amber-600: #a9722c;
+  --color-amber-500: #c98a3c;
+  --color-amber-100: #f6ead6;
+  --color-clay-700: #93412f;
+  --color-clay-600: #b4553f;
+  --color-clay-100: #f6e0da;
+
+  /* ── Radius ─────────────────────────────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* ── Motion ─────────────────────────────────────────────────────────────── */
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* ── Type families (wired to next/font in layout.tsx) ───────────────────── */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+/* ── Semantic tokens: light (the designed-for case) ───────────────────────── */
+:root {
+  --bg: var(--color-ivory-50);
+  --bg-subtle: var(--color-ivory-100);
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-inverse: var(--color-navy-900);
+
+  --line: #e4e0d5;
+  --line-strong: #cfc9ba;
+
+  --ink: var(--color-charcoal-900);
+  --ink-muted: var(--color-slate-500);
+  --ink-faint: var(--color-slate-400);
+  --ink-inverse: var(--color-ivory-50);
+
+  --primary: var(--color-teal-600);
+  --primary-hover: var(--color-teal-700);
+  --primary-ink: #ffffff;
+  --primary-soft: var(--color-teal-100);
+
+  --protect: var(--color-sage-500);
+  --protect-soft: var(--color-sage-100);
+  --watch: var(--color-amber-500);
+  --watch-soft: var(--color-amber-100);
+  --risk: var(--color-clay-600);
+  --risk-soft: var(--color-clay-100);
+
+  --focus-ring: var(--color-teal-600);
+
+  --shadow-soft: 0 1px 2px rgb(32 37 43 / 0.04), 0 2px 8px rgb(32 37 43 / 0.04);
+  --shadow-lift: 0 2px 4px rgb(32 37 43 / 0.06), 0 12px 28px rgb(32 37 43 / 0.1);
+
+  color-scheme: light;
+}
+
+/* ── Semantic tokens: dark (full swap; every token redefined) ─────────────── */
+.dark {
+  --bg: var(--color-navy-900);
+  --bg-subtle: #0a1622;
+  --surface: var(--color-navy-800);
+  --surface-raised: var(--color-navy-700);
+  --surface-inverse: var(--color-ivory-50);
+
+  --line: #24405b;
+  --line-strong: #34567a;
+
+  --ink: #eef2f6;
+  --ink-muted: #9fb0c2;
+  --ink-faint: #71889e;
+  --ink-inverse: var(--color-navy-900);
+
+  --primary: var(--color-teal-400);
+  --primary-hover: var(--color-teal-500);
+  --primary-ink: var(--color-navy-900);
+  --primary-soft: #123c3c;
+
+  --protect: var(--color-sage-300);
+  --protect-soft: #1d3222;
+  --watch: #dfa85a;
+  --watch-soft: #3a2c14;
+  --risk: #d97a62;
+  --risk-soft: #3d1f18;
+
+  --focus-ring: var(--color-teal-400);
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.24);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.34), 0 12px 28px rgb(0 0 0 / 0.4);
+
+  color-scheme: dark;
+}
+
+/* Expose the semantic tokens as Tailwind utilities: bg-surface, text-ink-muted… */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-inverse: var(--ink-inverse);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-protect: var(--protect);
+  --color-protect-soft: var(--protect-soft);
+  --color-watch: var(--watch);
+  --color-watch-soft: var(--watch-soft);
+  --color-risk: var(--risk);
+  --color-risk-soft: var(--risk-soft);
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* A single, consistent, always-visible focus treatment. */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background: var(--primary-soft);
+    color: var(--ink);
+  }
+
+  /* Scores and meters must not shift width as digits change. */
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* ── Type scale ───────────────────────────────────────────────────────────── */
+@layer components {
+  .type-display {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    font-variation-settings: 'SOFT' 20, 'WONK' 1;
+  }
+
+  .type-statement {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+    line-height: 1.2;
+    letter-spacing: -0.012em;
+    font-weight: 500;
+    font-variation-settings: 'SOFT' 20, 'WONK' 1;
+  }
+
+  .type-h1 {
+    font-size: 1.75rem;
+    line-height: 1.25;
+    letter-spacing: -0.012em;
+    font-weight: 600;
+  }
+
+  .type-h2 {
+    font-size: 1.375rem;
+    line-height: 1.3;
+    letter-spacing: -0.008em;
+    font-weight: 600;
+  }
+
+  .type-h3 {
+    font-size: 1.125rem;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .type-body {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .type-small {
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .type-label {
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+}
+
+/* ── Surfaces ─────────────────────────────────────────────────────────────────
+   Soft directional washes for the primary panels. Built with color-mix over the
+   semantic tokens rather than fixed colours, so they re-theme with everything else
+   and stay legal under the no-raw-hex rule.
+   ──────────────────────────────────────────────────────────────────────────── */
+@layer components {
+  .wash-primary {
+    background-image:
+      radial-gradient(
+        120% 150% at 0% 0%,
+        color-mix(in oklab, var(--primary) 15%, transparent) 0%,
+        transparent 58%
+      ),
+      radial-gradient(
+        100% 130% at 100% 0%,
+        color-mix(in oklab, var(--protect) 14%, transparent) 0%,
+        transparent 52%
+      );
+  }
+
+  .wash-risk {
+    background-image: radial-gradient(
+      120% 150% at 0% 0%,
+      color-mix(in oklab, var(--risk) 16%, transparent) 0%,
+      transparent 60%
+    );
+  }
+
+  .wash-quiet {
+    background-image: radial-gradient(
+      110% 140% at 100% 0%,
+      color-mix(in oklab, var(--ink) 5%, transparent) 0%,
+      transparent 55%
+    );
+  }
+
+  /* A hairline highlight along the top edge. Reads as depth without a heavy border. */
+  .edge-light {
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--surface) 70%, white 30%),
+      var(--shadow-soft);
+  }
+
+  /* Cards that respond to the pointer. Transform is cheap and reduced-motion-safe. */
+  .lift {
+    transition:
+      transform 240ms var(--ease-out-soft),
+      box-shadow 240ms var(--ease-out-soft);
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+/* ── Motion ───────────────────────────────────────────────────────────────── */
+@layer utilities {
+  .animate-rise {
+    animation: rise 320ms var(--ease-out-soft) both;
+  }
+
+  .animate-fade {
+    animation: fade 200ms var(--ease-out-soft) both;
+  }
+
+  .animate-draw {
+    animation: draw 700ms var(--ease-out-soft) both;
+  }
+
+  /* Progressive-status lists stagger so the council feels alive without a spinner. */
+  .stagger > * {
+    animation: rise 280ms var(--ease-out-soft) both;
+  }
+  .stagger > *:nth-child(2) {
+    animation-delay: 70ms;
+  }
+  .stagger > *:nth-child(3) {
+    animation-delay: 140ms;
+  }
+  .stagger > *:nth-child(4) {
+    animation-delay: 210ms;
+  }
+  .stagger > *:nth-child(5) {
+    animation-delay: 280ms;
+  }
+  .stagger > *:nth-child(6) {
+    animation-delay: 350ms;
+  }
+  .stagger > *:nth-child(7) {
+    animation-delay: 420ms;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--draw-length, 1000);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Reduced motion is honoured globally, not per component. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Print (game plan export) ─────────────────────────────────────────────── */
+@media print {
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --ink: #000000;
+  }
+
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  .page-break {
+    break-before: page;
+  }
+}

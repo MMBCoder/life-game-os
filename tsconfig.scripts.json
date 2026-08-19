@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "paths": {
+      "@/*": ["./src/*"],
+      // Scripts execute the server modules directly in Node, where the real
+      // `server-only` package throws by design. See scripts/server-only-stub.ts.
+      "server-only": ["./scripts/server-only-stub.ts"]
+    }
+  },
+  "include": ["scripts/**/*.ts", "src/**/*.ts"]
+}
