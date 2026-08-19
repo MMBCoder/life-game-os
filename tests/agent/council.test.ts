@@ -73,7 +73,48 @@ describe('routing', () => {
     const plan = route('decision', 2);
     expect(plan.secondPass).toContain('redTeam');
     expect(plan.secondPass).toContain('orchestrator');
-    expect(plan.firstPass.length).toBeLessThanOrEqual(1);
+  });
+
+  /**
+   * The guardians are the only agents holding a veto. Trimming them to save cost
+   * would remove the protection guarantee on exactly the runs most likely to need
+   * it — and the cap is set by an operator who cannot see that consequence.
+   */
+  it('never trims the health or relationship guardian, however tight the budget', () => {
+    for (const cap of [1, 2, 3, 4, 5, 6, 8]) {
+      const plan = route('decision', cap);
+      expect(plan.firstPass, `cap=${cap}`).toContain('health');
+      expect(plan.firstPass, `cap=${cap}`).toContain('relationships');
+    }
+  });
+
+  it('trims non-guardian agents instead, and always leaves at least one', () => {
+    const tight = route('decision', 1);
+    const full = route('decision', 8);
+
+    const nonGuardians = (agents: readonly string[]) =>
+      agents.filter((a) => a !== 'health' && a !== 'relationships');
+
+    expect(nonGuardians(tight.firstPass).length).toBe(1);
+    expect(nonGuardians(full.firstPass).length).toBeGreaterThan(1);
+    // A council of only vetoes would have nothing to vote on.
+    expect(tight.firstPass).toContain('strategy');
+  });
+
+  it('lets the cap yield rather than shed a veto, and says so in the plan', () => {
+    // decision routes 4 first-pass + 2 second-pass agents. A cap of 2 cannot be met
+    // without dropping a guardian, so the cap loses.
+    const plan = route('decision', 2);
+    const total = plan.firstPass.length + plan.secondPass.length;
+
+    expect(total).toBeGreaterThan(2);
+    expect(plan.firstPass).toContain('health');
+  });
+
+  it('applies the cap normally when no guardian is in the route', () => {
+    // insight_plan routes identity, reality, reflection — no guardians, no second pass.
+    const plan = route('insight_plan', 2);
+    expect(plan.firstPass).toHaveLength(2);
   });
 
   it('marks significant purposes as such', () => {

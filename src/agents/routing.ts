@@ -1,4 +1,4 @@
-import type { AgentId, CouncilPurpose } from '@/schemas/agent';
+import { GUARDIAN_AGENTS, type AgentId, type CouncilPurpose } from '@/schemas/agent';
 
 /**
  * Agent routing. The orchestrator never runs all thirteen agents — routing is the
@@ -50,12 +50,27 @@ export function route(purpose: CouncilPurpose, maxAgents: number): RoutePlan {
   const firstPass = all.filter((a) => !SECOND_PASS.includes(a));
   const secondPass = all.filter((a) => SECOND_PASS.includes(a));
 
-  // The cap trims the first pass only. Dropping the Red Team or the Orchestrator to
-  // save cost would remove exactly the scrutiny that makes the recommendation safe.
-  const budget = Math.max(1, maxAgents - secondPass.length);
+  // The cap is a cost guard, and cost is never a reason to remove scrutiny. Three
+  // groups are exempt from it:
+  //
+  //   Red Team + Orchestrator   the second pass, which finds how the plan fails and
+  //                             then resolves it
+  //   Health + Relationship     the guardians, the only agents holding a veto
+  //
+  // Trimming by list position instead would quietly drop the guardians first on a
+  // low cap — removing the veto holders to save a few cents, on the exact runs where
+  // a plan is most likely to be overreaching.
+  const guardians = firstPass.filter((a) => GUARDIAN_AGENTS.includes(a));
+  const trimmable = firstPass.filter((a) => !GUARDIAN_AGENTS.includes(a));
+
+  // At least one non-guardian always runs: a council of only vetoes has nothing to
+  // vote on. If that pushes the total past the cap, the cap yields.
+  const budget = Math.max(1, maxAgents - secondPass.length - guardians.length);
+  const kept = new Set<AgentId>([...trimmable.slice(0, budget), ...guardians]);
 
   return {
-    firstPass: firstPass.slice(0, budget),
+    // Filtered from the original list so ordering stays stable and readable.
+    firstPass: firstPass.filter((a) => kept.has(a)),
     secondPass,
     isSignificant: secondPass.includes('redTeam'),
   };

@@ -250,3 +250,24 @@ dropped.
 **Safety.** A level describes a stance being operated from right now, never the person, and is
 never framed as clinical (CLAUDE.md §6). A test asserts the bottom rung carries no diagnostic
 vocabulary, because the -7 copy is the copy most likely to do harm.
+
+## D20 — The cost cap may not shed a veto
+
+**Decision.** `AI_MAX_AGENTS_PER_RUN` exempts four agents: the Red Team and Orchestrator (the
+second pass) and the Health and Relationship Guardians (the only veto holders). When the cap
+cannot be met without dropping one, the cap yields.
+
+**Why.** The original implementation trimmed with `firstPass.slice(0, budget)` — by list position.
+For every full-council route the order is `strategy, capacity, health, relationships`, so a cap of
+5 silently dropped the Relationship Guardian and a cap of 4 dropped both. An operator setting that
+number is trying to control spend; there is no way for them to see that they have just removed the
+protection guarantee, and it fails *open* — the plan still ships, just unexamined, on precisely the
+runs where a plan is most likely to be overreaching.
+
+**The remaining trade-off.** At least one non-guardian always runs, because a council of only
+vetoes has nothing to vote on. On a very low cap the total therefore exceeds the requested number.
+That is the correct direction to fail: spending a few more cents is recoverable, shipping a plan
+that quietly spends someone's health is not.
+
+**Also corrected.** The README claimed the guardians were already exempt. They were not. Covered
+now by tests asserting both guardians survive every cap from 1 to 8.

@@ -225,10 +225,19 @@ the slowest call in each round. Measured on OpenAI with six agents:
 | `deep=gpt-5.5` | ~10 minutes |
 
 This is inherent to reasoning models rather than a defect, but it has two consequences worth
-planning for. Lower `AI_MAX_AGENTS_PER_RUN` to trim the first pass — guardians and red team are
-never trimmed, so protection is unaffected. And on a host that caps request duration (Vercel's
-serverless functions default well below this), a full council will need a raised limit or a
-background job; the single-artefact calls, at roughly 10–30 seconds, are unaffected.
+planning for.
+
+**Lowering `AI_MAX_AGENTS_PER_RUN` helps less than it looks.** It only trims non-guardian
+first-pass agents, and those run *in parallel* — so the wall clock is set by the slowest one, not
+by how many there are. Dropping from 8 to 6 saves tokens, not time. To make a council run faster,
+change the models (`AI_MODEL_DEEP=gpt-5.4-mini` roughly quarters it), because the three rounds are
+sequential and each round waits on a single model call.
+
+**Request-duration limits will bite before anything else.** A full council exceeds the default
+serverless function timeout on most hosts, Vercel included. Either raise `maxDuration` on the
+routes that convene the council, move those runs to a background job, or use the faster model
+tier. Single-artefact calls — Whole Goal, a daily plan, suggestions — are 10–30 seconds and fine
+anywhere.
 
 ---
 
@@ -248,7 +257,7 @@ development.
 | `AI_MODEL_STANDARD` | No | per provider | Most agent analysis. |
 | `AI_MODEL_LIGHT` | No | per provider | Suggestions, short rewrites, classification. |
 | `AI_MODEL_EMBEDDING` | No | `text-embedding-3-small` | OpenAI only. Unused today; reserved for semantic memory retrieval. |
-| `AI_MAX_AGENTS_PER_RUN` | No | `8` | Hard ceiling per council run. Guardians and red team are exempt. |
+| `AI_MAX_AGENTS_PER_RUN` | No | `8` | Ceiling on agents per council run. The Health and Relationship Guardians, the Red Team and the Orchestrator are exempt — cost is never a reason to remove a veto or the scrutiny, so a tight cap yields rather than shedding them. |
 | `AI_PRICING_JSON` | No | — | Cost rates in USD per million tokens, e.g. `{"gpt-5.4":{"input":1.25,"output":10}}`. See [cost reporting](#cost-reporting). |
 | `ENABLE_ADMIN` | No | `true` | Exposes `/admin` (agent runs, latency, cost, validation, conflicts). Set `false` in production. |
 | `NEXT_PUBLIC_APP_URL` | No | — | Absolute URLs in exports. |
