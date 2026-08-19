@@ -484,4 +484,10 @@ nothing is copied, and no affiliation with any source material is implied.
 | [docs/design-system.md](./docs/design-system.md) | Palette, type scale, motion, accessibility |
 | [docs/evaluation-plan.md](./docs/evaluation-plan.md) | The eight qualities and how they are measured |
 | [docs/roadmap.md](./docs/roadmap.md) | Milestones M0-M15 |
-| [docs/decisions.md](./docs/decisions.md) | D1-D14, each with the alternatives and why they lost |
+| [docs/decisions.md](./docs/decisions.md) | Every architectural decision, with the alternatives and why they lost |
+
+---
+
+## Licence
+
+MIT — see [LICENSE](./LICENSE).
