@@ -41,6 +41,19 @@ function hashToken(token: string): string {
   return createHmac('sha256', sessionSecret()).update(token).digest('hex');
 }
 
+/**
+ * Fails before anything is written.
+ *
+ * Sign-up creates the account and *then* the session. Discovering a missing
+ * SESSION_SECRET at the second step leaves an account with no session: the person
+ * sees a generic error, retrying tells them the email is taken, and signing in fails
+ * for the same reason — locked out of an account they never knowingly created.
+ * Checking first turns that into a clean, retryable failure.
+ */
+export function assertSessionConfig(): void {
+  sessionSecret();
+}
+
 function expiryFromNow(days = SESSION_DAYS): Date {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 }

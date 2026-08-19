@@ -4,7 +4,12 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createUser, findUserByEmail } from '@/lib/db/repositories/users';
 import { verifyPassword, validatePassword } from '@/lib/auth/password';
-import { createSession, destroySession, purgeExpiredSessions } from '@/lib/auth/session';
+import {
+  assertSessionConfig,
+  createSession,
+  destroySession,
+  purgeExpiredSessions,
+} from '@/lib/auth/session';
 import { AppError, fail, failWith, logFailure, type ActionResult } from '@/lib/errors';
 
 const signUpSchema = z.object({
@@ -39,6 +44,9 @@ export async function signUpAction(
   if (passwordProblem) return failWith(passwordProblem, 'password');
 
   try {
+    // Before the account exists, so a misconfigured deployment cannot orphan it.
+    assertSessionConfig();
+
     const user = await createUser({
       name: parsed.data.name,
       email: parsed.data.email,
