@@ -408,8 +408,33 @@ Target: **Vercel**, though any Node host works.
    ```
 4. **Deploy.** Push to Vercel, or `npm run build && npm run start` anywhere else.
 
-Miss step 3 and the first sign-up returns a 500 with `relation "users" does not exist` — the
-tables simply are not there yet.
+Miss step 3 and sign-up fails with *"Something went wrong. Your existing plan is safe."* — the
+generic message, because users are never shown a database error.
+
+### Diagnosing a deployment: `GET /api/health`
+
+Rather than reading logs, ask the deployment what is wrong:
+
+```bash
+curl https://your-app.vercel.app/api/health
+```
+
+```json
+{
+  "ok": false,
+  "database": { "driver": "postgres", "connectionConfigured": true,
+                "connection": "ok", "tables": "missing" },
+  "session": { "secret": "ok" },
+  "ai": { "provider": "openai" },
+  "hints": ["Connected, but the tables do not exist yet — this is why sign-up fails. Run …"]
+}
+```
+
+`200` when healthy, `503` with an ordered `hints` array when not. It distinguishes the three
+failures that look identical from the outside — no connection string, a database that cannot be
+reached, and a database with no schema — and reports only booleans, enums and the driver's error
+code. No connection string, no host, no key, not even a prefix. It needs no session, because the
+failure it most often explains is the one stopping you creating the first account.
 
 ### Why history needs a real database
 

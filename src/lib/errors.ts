@@ -60,15 +60,23 @@ export function userMessageFor(error: unknown): string {
 }
 
 /**
- * Logs a failure without leaking personal data. Only the kind, a short code and
- * ids are recorded — never prompt content, reflections, or user text (CLAUDE.md §8).
+ * Logs a failure without leaking personal data (CLAUDE.md §8).
+ *
+ * The `reason` is the error's own message, which for the failures that actually need
+ * diagnosing — a missing table, a refused connection, a misconfigured environment —
+ * is the only thing that identifies the problem. Logging just a kind and a class name
+ * produces entries like `{"kind":"unknown","code":"PostgresError"}`, which is
+ * indistinguishable from every other database failure and sends the operator hunting.
+ *
+ * Deliberately excluded: a Postgres error's `detail`, which echoes the offending row
+ * values (`Key (email)=(someone@example.com) already exists`) and so can carry
+ * personal data. Prompt content, reflections and user text are never logged at all.
  */
 export function logFailure(scope: string, error: unknown, meta?: Record<string, string>): void {
   const kind = error instanceof AppError ? error.kind : 'unknown';
   const code = error instanceof Error ? error.name : 'NonError';
-  console.error(
-    JSON.stringify({ scope, kind, code, ...meta }),
-  );
+  const reason = error instanceof Error ? error.message.slice(0, 300) : undefined;
+  console.error(JSON.stringify({ scope, kind, code, reason, ...meta }));
 }
 
 /** Result type for Server Actions, so the UI can render errors without exceptions. */
